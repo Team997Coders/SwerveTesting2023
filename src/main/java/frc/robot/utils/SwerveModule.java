@@ -1,7 +1,5 @@
 package frc.robot.utils;
 
-import java.io.PrintStream;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
@@ -12,8 +10,12 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -39,9 +41,11 @@ public class SwerveModule extends SubsystemBase {
                     kSwerve.kMaxModuleAngularSpeedRadiansPerSecond,
                     kSwerve.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
 
+    private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(Constants.kSwerve.DRIVE_KS,
+            Constants.kSwerve.DRIVE_KV);
+
     public SwerveModule(int moduleNumber, SwerveModuleConstants constants) {
         this.moduleNumber = moduleNumber;
-        System.out.println("Module " + moduleNumber);
 
         m_driveMotor = new CANSparkMax(constants.driveMotorID, MotorType.kBrushless);
         m_turnMotor = new CANSparkMax(constants.angleMotorID, MotorType.kBrushless);
@@ -57,11 +61,58 @@ public class SwerveModule extends SubsystemBase {
         resetEncoders();
         stopAll();
 
-        SmartDashboard.putNumber("Module "+moduleNumber+" Drive Encoder", m_driveEncoder.getPosition());
-        SmartDashboard.putNumber("Module "+moduleNumber+" Turn Encoder", m_turnEncoder.getPosition());
-        SmartDashboard.putNumber("Module "+moduleNumber+" Angle Encoder", m_angleEncoder.getPosition());
+        SmartDashboard.putNumber("Module " + moduleNumber + " Drive Encoder", m_driveEncoder.getPosition());
+        SmartDashboard.putNumber("Module " + moduleNumber + " Turn Encoder", m_turnEncoder.getPosition());
+        SmartDashboard.putNumber("Module " + moduleNumber + " Angle Encoder", m_angleEncoder.getPosition());
     }
 
+    /**
+     * Returns the current state of the module.
+     *
+     * @return The current state of the module.
+     */
+    public SwerveModuleState getState() {
+        return new SwerveModuleState(
+                m_driveEncoder.getVelocity(), new Rotation2d(m_angleEncoder.getPosition()));
+    }
+
+    /**
+     * Returns the current position of the module.
+     *
+     * @return The current position of the module.
+     */
+    public SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(
+                m_driveEncoder.getPosition(), new Rotation2d(m_angleEncoder.getPosition()));
+    }
+
+    /**
+     * Sets the desired state for the module.
+     *
+     * @param desiredState Desired state with speed and angle.
+     */
+    public void setState(SwerveModuleState desiredState) {
+        // Optimize the reference state to avoid spinning further than 90 degrees
+        SwerveModuleState state = SwerveModuleState.optimize(desiredState,
+                new Rotation2d(m_angleEncoder.getPosition()));
+
+        // Calculate the drive output from the drive PID controller.
+        final double driveOutput = m_drivePIDController.calculate(m_driveEncoder.getVelocity(),
+                state.speedMetersPerSecond);
+
+        final double driveFeedforward = m_driveFeedforward.calculate(state.speedMetersPerSecond);
+
+        // Calculate the turning motor output from the turning PID controller.
+        final double turnOutput = m_turningPIDController.calculate(m_angleEncoder.getPosition(),
+                state.angle.getRadians());
+
+        m_driveMotor.setVoltage(driveOutput + driveFeedforward);
+        m_turnMotor.setVoltage(turnOutput);
+    }
+
+    /**
+     * Reset the motor encoders to zero
+     */
     public void resetEncoders() {
         m_driveEncoder.setPosition(0);
         m_turnEncoder.setPosition(0);
@@ -74,6 +125,7 @@ public class SwerveModule extends SubsystemBase {
 
     private void configureDevices() {
         // Drive motor configuration.
+        // NEO Motor connected to SParkMax
         m_driveMotor.restoreFactoryDefaults();
         m_driveMotor.clearFaults();
         if (m_driveMotor.setIdleMode(IdleMode.kCoast) != REVLibError.kOk) {
@@ -90,7 +142,7 @@ public class SwerveModule extends SubsystemBase {
         m_driveEncoder.setPosition(0);
 
         // Angle motor configuration.
-        m_turnMotor.restoreFactoryDefaults();
+        // Neo Motor connected to SParkMax
         m_turnMotor.restoreFactoryDefaults();
         m_turnMotor.clearFaults();
         if (m_turnMotor.setIdleMode(IdleMode.kCoast) != REVLibError.kOk) {
@@ -100,6 +152,11 @@ public class SwerveModule extends SubsystemBase {
         m_turnMotor.setIdleMode(Constants.kSwerve.ANGLE_IDLE_MODE);
         m_turnMotor.setSmartCurrentLimit(Constants.kSwerve.ANGLE_CURRENT_LIMIT);
 
+        /**
+         * CTRE Mag Encoder connected to the SparkMAX Absolute/Analog/PWM Duty Cycle
+         * input
+         * Native will ready 0.0 -> 1.0 for each revolution.
+         */
         m_angleEncoder.setPositionConversionFactor(Constants.kSwerve.ANGLE_ROTATIONS_TO_RADIANS);
         m_angleEncoder.setVelocityConversionFactor(Constants.kSwerve.ANGLE_RPM_TO_RADIANS_PER_SECOND);
         m_angleEncoder.setInverted(false);

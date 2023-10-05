@@ -38,19 +38,16 @@ public final class Constants {
     public static final double WHEEL_DIAMETER = Units.inchesToMeters(4);
     public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
 
-    public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
-      new Translation2d(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
-      new Translation2d(WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0),
-      new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
-      new Translation2d(-WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0)
-    );
+
 
     // SDS Mk4i L2 Drive Ratio = 6.75:1, Angle Ratio = 150/7:1
     public static final double DRIVE_GEAR_RATIO = 6.75 / 1.0; // 6.75:1
     public static final double DRIVE_ROTATIONS_TO_METERS = WHEEL_CIRCUMFERENCE / DRIVE_GEAR_RATIO;
     public static final double DRIVE_RPM_TO_METERS_PER_SECOND = DRIVE_ROTATIONS_TO_METERS / 60.0;
-    public static final double ANGLE_GEAR_RATIO = 12.8 / 1.0; // 12.8:1
-    public static final double ANGLE_ROTATIONS_TO_RADIANS = (Math.PI * 2) / ANGLE_GEAR_RATIO;
+    public static final double ANGLE_MOTOR_GEAR_RATIO = 12.8 / 1.0; // 12.8:1
+
+    /* note that these angle constant refer to the CTRE absolute encoder */
+    public static final double ANGLE_ROTATIONS_TO_RADIANS = (Math.PI * 2);
     public static final double ANGLE_RPM_TO_RADIANS_PER_SECOND = DRIVE_ROTATIONS_TO_METERS / 60.0;
 
     /** Speed ramp. */
@@ -73,6 +70,7 @@ public final class Constants {
     public static final double ANGLE_KF = 0.0;
     
     /** Swerve constraints. */
+    public static final double MAX_VELOCITY_METERS_PER_SECOND = 3.0;
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
 
@@ -93,24 +91,28 @@ public final class Constants {
      * CanCoder offset is in DEGREES, not radians like the rest of the repo.
      * This is to make offset slightly more accurate and easier to measure.
      */
+    // Front Left Module
     public static final SwerveModuleConstants kMOD_1_Constants = new SwerveModuleConstants(
       6,
       7,
       254.5 // 360 * 0.7069
     );
 
+    // Front Right
     public static final SwerveModuleConstants kMOD_2_Constants = new SwerveModuleConstants(
       4,
       5,
       152.0 // 360*0.4221 
     );
 
+    // Back Left
     public static final SwerveModuleConstants kMOD_3_Constants = new SwerveModuleConstants(
       2,
       3,
       0.0
     );
 
+    // Back Right
     public static final SwerveModuleConstants kMOD_4_Constants = new SwerveModuleConstants(
       1,
       8,
