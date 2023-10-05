@@ -1,5 +1,7 @@
 package frc.robot.utils;
 
+import java.io.PrintStream;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
@@ -39,8 +41,12 @@ public class SwerveModule extends SubsystemBase {
 
     public SwerveModule(int moduleNumber, SwerveModuleConstants constants) {
         this.moduleNumber = moduleNumber;
+        System.out.println("Module " + moduleNumber);
 
+        System.out.println("Drive Motor " + constants.driveMotorID);
         m_driveMotor = new CANSparkMax(constants.driveMotorID, MotorType.kBrushless);
+
+        System.out.println("Angle Motor " + constants.angleMotorID);
         m_turnMotor = new CANSparkMax(constants.angleMotorID, MotorType.kBrushless);
 
         m_driveEncoder = m_driveMotor.getEncoder();
