@@ -5,6 +5,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.utils.SwerveModule;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -16,8 +17,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class Drivetrain extends SubsystemBase {
-
-  private AHRS m_gyro;
 
   private final SwerveModule[] modules = new SwerveModule[] {
       new SwerveModule(1, Constants.kSwerve.kMOD_1_Constants), // Front Left
@@ -34,7 +33,7 @@ public class Drivetrain extends SubsystemBase {
 
   private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       m_kinematics,
-      m_gyro.getRotation2d(),
+      RobotContainer.m_gyro.getRotation2d(),
       new SwerveModulePosition[] {
           modules[0].getPosition(), // front left
           modules[1].getPosition(), // front right
@@ -50,7 +49,7 @@ public class Drivetrain extends SubsystemBase {
        * See http://navx-mxp.kauailabs.com/guidance/selecting-an-interface/ for
        * details.
        */
-      m_gyro = new AHRS();
+      RobotContainer.m_gyro = new AHRS();
     } catch (RuntimeException ex) {
       DriverStation.reportError("Error instantiating navX-MXP:  " + ex.getMessage(), true);
     }
@@ -59,11 +58,11 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public Rotation2d getYaw() {
-    return Rotation2d.fromDegrees(-m_gyro.getYaw());
+    return Rotation2d.fromDegrees(-RobotContainer.m_gyro.getYaw());
   }
 
   private void zeroGyro() {
-    m_gyro.zeroYaw();
+    RobotContainer.m_gyro.zeroYaw();
   }
 
   /**
@@ -80,7 +79,7 @@ public class Drivetrain extends SubsystemBase {
 
       ChassisSpeeds chassisSpeeds = fieldRelative
         ? ChassisSpeeds.fromFieldRelativeSpeeds(
-            xSpeed, ySpeed, rot, m_gyro.getRotation2d())
+            xSpeed, ySpeed, rot, RobotContainer.m_gyro.getRotation2d())
         : new ChassisSpeeds(xSpeed, ySpeed, rot);
 
       SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(chassisSpeeds);
@@ -100,7 +99,7 @@ public class Drivetrain extends SubsystemBase {
   /** Updates the field relative position of the robot. */
   public void updateOdometry() {
     m_odometry.update(
-        m_gyro.getRotation2d(),
+        RobotContainer.m_gyro.getRotation2d(),
         new SwerveModulePosition[] {
             modules[0].getPosition(),
             modules[1].getPosition(),
@@ -113,7 +112,7 @@ public class Drivetrain extends SubsystemBase {
   public Command resetYaw() {
     return runOnce(
         () -> {
-          m_gyro.reset();
+          RobotContainer.m_gyro.reset();
         });
   }
 
