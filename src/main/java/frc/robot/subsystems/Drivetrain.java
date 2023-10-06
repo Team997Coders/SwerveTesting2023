@@ -5,7 +5,6 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 import frc.robot.utils.SwerveModule;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -18,7 +17,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class Drivetrain extends SubsystemBase {
 
-  private final SwerveModule[] modules = new SwerveModule[] {
+  private AHRS m_gyro;
+
+  public final SwerveModule[] modules = new SwerveModule[] {
       new SwerveModule(1, Constants.kSwerve.kMOD_1_Constants), // Front Left
       new SwerveModule(2, Constants.kSwerve.kMOD_2_Constants), // Front Right
       new SwerveModule(3, Constants.kSwerve.kMOD_3_Constants), // Back Left
@@ -31,17 +32,8 @@ public class Drivetrain extends SubsystemBase {
       new Translation2d(-Constants.kSwerve.WHEEL_BASE / 2.0, Constants.kSwerve.TRACK_WIDTH / 2.0),
       new Translation2d(-Constants.kSwerve.WHEEL_BASE / 2.0, -Constants.kSwerve.TRACK_WIDTH / 2.0));
 
-  private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
-      m_kinematics,
-      RobotContainer.m_gyro.getRotation2d(),
-      new SwerveModulePosition[] {
-          modules[0].getPosition(), // front left
-          modules[1].getPosition(), // front right
-          modules[2].getPosition(), // back left
-          modules[3].getPosition() // back right
-      });
-
-  public Drivetrain() {
+  public Drivetrain(AHRS gyro) {
+    this.m_gyro = gyro;
     try {
       /* Communicate w/navX-MXP via the MXP SPI Bus. */
       /* Alternatively: I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB */
@@ -49,7 +41,7 @@ public class Drivetrain extends SubsystemBase {
        * See http://navx-mxp.kauailabs.com/guidance/selecting-an-interface/ for
        * details.
        */
-      RobotContainer.m_gyro = new AHRS();
+      //RobotContainer.m_gyro = new AHRS();
     } catch (RuntimeException ex) {
       DriverStation.reportError("Error instantiating navX-MXP:  " + ex.getMessage(), true);
     }
@@ -57,12 +49,22 @@ public class Drivetrain extends SubsystemBase {
     zeroGyro();
   }
 
+  private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
+    m_kinematics,
+    m_gyro.getRotation2d(),
+    new SwerveModulePosition[] {
+        modules[0].getPosition(), // front left
+        modules[1].getPosition(), // front right
+        modules[2].getPosition(), // back left
+        modules[3].getPosition() // back right
+    });
+
   public Rotation2d getYaw() {
-    return Rotation2d.fromDegrees(-RobotContainer.m_gyro.getYaw());
+    return Rotation2d.fromDegrees(-m_gyro.getYaw());
   }
 
   private void zeroGyro() {
-    RobotContainer.m_gyro.zeroYaw();
+    m_gyro.zeroYaw();
   }
 
   /**
@@ -74,12 +76,11 @@ public class Drivetrain extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the
    *                      field.
    */
-  public void drive(
-      double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
 
       ChassisSpeeds chassisSpeeds = fieldRelative
         ? ChassisSpeeds.fromFieldRelativeSpeeds(
-            xSpeed, ySpeed, rot, RobotContainer.m_gyro.getRotation2d())
+            xSpeed, ySpeed, rot, m_gyro.getRotation2d())
         : new ChassisSpeeds(xSpeed, ySpeed, rot);
 
       SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(chassisSpeeds);
@@ -96,33 +97,22 @@ public class Drivetrain extends SubsystemBase {
     }
   }
 
+  public void reset_encoders() {
+    modules[0].resetEncoders();
+    modules[1].resetEncoders();
+    modules[2].resetEncoders();
+    modules[3].resetEncoders();
+  }
+  
   /** Updates the field relative position of the robot. */
   public void updateOdometry() {
     m_odometry.update(
-        RobotContainer.m_gyro.getRotation2d(),
+        m_gyro.getRotation2d(),
         new SwerveModulePosition[] {
             modules[0].getPosition(),
             modules[1].getPosition(),
             modules[2].getPosition(),
             modules[3].getPosition()
-        });
-  }
-
-  /* a couple of utility commands */
-  public Command resetYaw() {
-    return runOnce(
-        () -> {
-          RobotContainer.m_gyro.reset();
-        });
-  }
-
-  public Command reset_encoders() {
-    return runOnce(
-        () -> {
-          modules[0].resetEncoders();
-          modules[1].resetEncoders();
-          modules[2].resetEncoders();
-          modules[3].resetEncoders();
         });
   }
 }

@@ -6,10 +6,12 @@ package frc.robot;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.utils.SwerveModuleConstants;
 
 /**
@@ -37,8 +39,6 @@ public final class Constants {
     public static final double WHEEL_BASE = Units.inchesToMeters(24.0); // Length of the drivetrain measured from the middle of the wheels.
     public static final double WHEEL_DIAMETER = Units.inchesToMeters(4);
     public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
-
-
 
     // SDS Mk4i L2 Drive Ratio = 6.75:1, Angle Ratio = 150/7:1
     public static final double DRIVE_GEAR_RATIO = 6.75 / 1.0; // 6.75:1
@@ -121,7 +121,18 @@ public final class Constants {
   }
 
   public static final class OperatorConstants {
+    public static final int TRANSLATION_X_AXIS = XboxController.Axis.kLeftX.value;
+    public static final int TRANSLATION_Y_AXIS = XboxController.Axis.kLeftY.value;
+    public static final int ROTATION_AXIS = XboxController.Axis.kRightX.value;
+
+    public static final int GYRO_RESET_BUTTON = XboxController.Button.kY.value;
+
     public static final int kDriverControllerPort = 0;
+
+    // Prevent from acclerating/decclerating to quick
+    public static final SlewRateLimiter X_DRIVE_LIMITER = new SlewRateLimiter(4);
+    public static final SlewRateLimiter Y_DRIVE_LIMITER = new SlewRateLimiter(4);
+    public static final SlewRateLimiter THETA_DRIVE_LIMITER = new SlewRateLimiter(4);
   }
 
   public static final class AutoConstants {

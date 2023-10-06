@@ -61,9 +61,6 @@ public class SwerveModule extends SubsystemBase {
         resetEncoders();
         stopAll();
 
-        SmartDashboard.putNumber("Module " + moduleNumber + " Drive Encoder", m_driveEncoder.getPosition());
-        SmartDashboard.putNumber("Module " + moduleNumber + " Turn Encoder", m_turnEncoder.getPosition());
-        SmartDashboard.putNumber("Module " + moduleNumber + " Angle Encoder", m_angleEncoder.getPosition());
     }
 
     /**
@@ -161,4 +158,17 @@ public class SwerveModule extends SubsystemBase {
         m_angleEncoder.setVelocityConversionFactor(Constants.kSwerve.ANGLE_RPM_TO_RADIANS_PER_SECOND);
         m_angleEncoder.setInverted(false);
     }
+
+    /**
+   * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
+   * that you want ran during disabled, autonomous, teleoperated and test.
+   *
+   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
+   * SmartDashboard integrated updating.
+   */
+  public void updateSmartdashboard() {
+    SmartDashboard.putNumber("Module " + moduleNumber + " Drive Encoder", m_driveEncoder.getPosition());
+    SmartDashboard.putNumber("Module " + moduleNumber + " Turn Encoder", m_turnEncoder.getPosition());
+    SmartDashboard.putNumber("Module " + moduleNumber + " Angle Encoder", m_angleEncoder.getPosition());
+  }
 }
