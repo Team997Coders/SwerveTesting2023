@@ -29,6 +29,7 @@ public class SwerveModule extends SubsystemBase {
     private RelativeEncoder m_driveEncoder;
     private RelativeEncoder m_turnEncoder;
     private SparkMaxAbsoluteEncoder m_angleEncoder;
+    private SwerveModuleConstants constants;
 
     private final PIDController m_drivePIDController = new PIDController(kSwerve.kPModuleDriveController, 0, 0);
 
@@ -52,6 +53,8 @@ public class SwerveModule extends SubsystemBase {
 
         m_driveEncoder = m_driveMotor.getEncoder();
         m_turnEncoder = m_turnMotor.getEncoder();
+
+        this.constants = constants;
 
         m_angleEncoder = m_turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
@@ -107,6 +110,14 @@ public class SwerveModule extends SubsystemBase {
         m_turnMotor.setVoltage(turnOutput);
     }
 
+    public void moveTurnMotor() {
+        m_turnMotor.setVoltage(2);
+    }
+
+    public void moveDriveMotor() {
+        m_driveMotor.setVoltage(2);
+    }
+
     /**
      * Reset the motor encoders to zero
      */
@@ -128,7 +139,7 @@ public class SwerveModule extends SubsystemBase {
         if (m_driveMotor.setIdleMode(IdleMode.kCoast) != REVLibError.kOk) {
             SmartDashboard.putString("Drive Motor Idle Mode", "Error");
         }
-        m_driveMotor.setInverted(Constants.kSwerve.DRIVE_MOTOR_INVERSION);
+        m_driveMotor.setInverted(constants.driveMotorIsInverted);
         m_driveMotor.setIdleMode(Constants.kSwerve.DRIVE_IDLE_MODE);
         m_driveMotor.setOpenLoopRampRate(Constants.kSwerve.OPEN_LOOP_RAMP);
         m_driveMotor.setClosedLoopRampRate(Constants.kSwerve.CLOSED_LOOP_RAMP);
@@ -145,7 +156,7 @@ public class SwerveModule extends SubsystemBase {
         if (m_turnMotor.setIdleMode(IdleMode.kCoast) != REVLibError.kOk) {
             SmartDashboard.putString("Turn Motor Idle Mode", "Error");
         }
-        m_turnMotor.setInverted(Constants.kSwerve.ANGLE_MOTOR_INVERSION);
+        m_turnMotor.setInverted(constants.angleMotorIsInverted);
         m_turnMotor.setIdleMode(Constants.kSwerve.ANGLE_IDLE_MODE);
         m_turnMotor.setSmartCurrentLimit(Constants.kSwerve.ANGLE_CURRENT_LIMIT);
 
@@ -156,7 +167,7 @@ public class SwerveModule extends SubsystemBase {
          */
         m_angleEncoder.setPositionConversionFactor(Constants.kSwerve.ANGLE_ROTATIONS_TO_RADIANS);
         m_angleEncoder.setVelocityConversionFactor(Constants.kSwerve.ANGLE_RPM_TO_RADIANS_PER_SECOND);
-        m_angleEncoder.setInverted(false);
+        m_angleEncoder.setZeroOffset(constants.angleEncoderOffsetRadians/Math.PI*2);
     }
 
     /**

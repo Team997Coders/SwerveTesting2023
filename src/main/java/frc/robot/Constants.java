@@ -7,7 +7,7 @@ package frc.robot;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation2d; 
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -79,7 +79,7 @@ public final class Constants {
 
     /** Inversions. */
     public static final boolean DRIVE_MOTOR_INVERSION = true;
-    public static final boolean ANGLE_MOTOR_INVERSION = false;
+    public static final boolean ANGLE_MOTOR_INVERSION = true;
     public static final boolean CANCODER_INVERSION = false;
 
     /** Idle modes. */
@@ -93,30 +93,46 @@ public final class Constants {
      */
     // Front Left Module
     public static final SwerveModuleConstants kMOD_1_Constants = new SwerveModuleConstants(
-      6,
-      7,
-      254.5 // 360 * 0.7069
-    );
+      8,
+      1,
+      2.43, // 360 * 0.7069
+      true,
+      true,
+      false,
+      false
+      );
 
     // Front Right
     public static final SwerveModuleConstants kMOD_2_Constants = new SwerveModuleConstants(
-      4,
-      5,
-      152.0 // 360*0.4221 
+      6,
+      7,
+      0.0, // 360*0.4221 
+      false,
+      false,
+      false,
+      false
     );
 
     // Back Left
     public static final SwerveModuleConstants kMOD_3_Constants = new SwerveModuleConstants(
-      2,
-      3,
-      0.0
+      4,
+      5,
+      0.0,
+      false,
+      false,
+      false,
+      false
     );
 
     // Back Right
     public static final SwerveModuleConstants kMOD_4_Constants = new SwerveModuleConstants(
-      1,
-      8,
-      0.0
+      2,
+      3,
+      0.0,
+      false,
+      false,
+      false,
+      false
     );
   }
 
