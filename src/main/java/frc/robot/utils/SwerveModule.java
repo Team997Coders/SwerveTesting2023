@@ -29,7 +29,7 @@ public class SwerveModule extends SubsystemBase {
     private RelativeEncoder m_driveEncoder;
     private RelativeEncoder m_turnEncoder;
     private SparkMaxAbsoluteEncoder m_angleEncoder;
-    private SwerveModuleConstants constants;
+    public SwerveModuleConstants constants;
 
     private final PIDController m_drivePIDController = new PIDController(kSwerve.kPModuleDriveController, 0, 0);
 
@@ -111,11 +111,15 @@ public class SwerveModule extends SubsystemBase {
     }
 
     public void moveTurnMotor() {
-        m_turnMotor.setVoltage(2);
+        m_turnMotor.setVoltage(1);
     }
 
     public void moveDriveMotor() {
-        m_driveMotor.setVoltage(2);
+        m_driveMotor.setVoltage(1);
+    }
+
+    public void goToSetPoint(double setPointRadians) {
+        m_turnMotor.set(m_turningPIDController.calculate(setPointRadians, setPointRadians));
     }
 
     /**
@@ -167,7 +171,7 @@ public class SwerveModule extends SubsystemBase {
          */
         m_angleEncoder.setPositionConversionFactor(Constants.kSwerve.ANGLE_ROTATIONS_TO_RADIANS);
         m_angleEncoder.setVelocityConversionFactor(Constants.kSwerve.ANGLE_RPM_TO_RADIANS_PER_SECOND);
-        m_angleEncoder.setZeroOffset(constants.angleEncoderOffsetRadians/Math.PI*2);
+        m_angleEncoder.setZeroOffset(constants.angleEncoderOffsetRadians);
     }
 
     /**

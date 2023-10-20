@@ -19,8 +19,9 @@ import frc.robot.utils.SwerveModule;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  private SwerveModule swerveModule1 = new SwerveModule(1, Constants.kSwerve.kMOD_1_Constants);
-
+  private SwerveModule swerveModule2 = new SwerveModule(2, Constants.kSwerve.kMOD_2_Constants);
+  private SwerveModule swerveModule3 = new SwerveModule(3, Constants.kSwerve.kMOD_3_Constants);
+  private SwerveModule swerveModule4 = new SwerveModule(4, Constants.kSwerve.kMOD_4_Constants);
   private RobotContainer m_robotContainer;
 
   /**
@@ -48,8 +49,9 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    swerveModule1.updateSmartdashboard();
-
+    swerveModule2.updateSmartdashboard();
+    swerveModule3.updateSmartdashboard();
+    swerveModule4.updateSmartdashboard();
  //   SmartDashboard.putNumber("Gyro Yaw Angle:", m_robotContainer.m_gyro.getYaw());
   }
 
@@ -74,7 +76,9 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    swerveModule1.moveDriveMotor();
+    swerveModule3.moveDriveMotor();
+    swerveModule2.moveDriveMotor();
+    swerveModule4.moveDriveMotor();
   }
 
   @Override
