@@ -4,10 +4,14 @@
 
 package frc.robot;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.Drivetrain;
+import frc.robot.utils.GoToAngularSetpoint;
 import frc.robot.utils.SwerveModule;
 
 /**
@@ -18,11 +22,11 @@ import frc.robot.utils.SwerveModule;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-
-  private SwerveModule swerveModule2 = new SwerveModule(2, Constants.kSwerve.kMOD_2_Constants);
-  private SwerveModule swerveModule3 = new SwerveModule(3, Constants.kSwerve.kMOD_3_Constants);
-  private SwerveModule swerveModule4 = new SwerveModule(4, Constants.kSwerve.kMOD_4_Constants);
+  private Drivetrain m_drivetrain = 
   private RobotContainer m_robotContainer;
+  private double[] setpointAngles = {0,0,0,0};
+  private GoToAngularSetpoint setpointCommand = new GoToAngularSetpoint(m_drivetrain, setpointAngles);
+  
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -32,8 +36,8 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-   // m_robotContainer = new RobotContainer();
-  }
+    m_robotContainer = new RobotContainer();
+  } 
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
@@ -49,9 +53,7 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    swerveModule2.updateSmartdashboard();
-    swerveModule3.updateSmartdashboard();
-    swerveModule4.updateSmartdashboard();
+    m_drivetrain.updateSmartdashboard();
  //   SmartDashboard.putNumber("Gyro Yaw Angle:", m_robotContainer.m_gyro.getYaw());
   }
 
@@ -76,9 +78,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    swerveModule3.moveDriveMotor();
-    swerveModule2.moveDriveMotor();
-    swerveModule4.moveDriveMotor();
+    
   }
 
   @Override

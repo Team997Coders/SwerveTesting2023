@@ -34,7 +34,7 @@ public class SwerveModule extends SubsystemBase {
     private final PIDController m_drivePIDController = new PIDController(kSwerve.kPModuleDriveController, 0, 0);
 
     // Using a TrapezoidProfile PIDController to allow for smooth turning
-    private final ProfiledPIDController m_turningPIDController = new ProfiledPIDController(
+    public final ProfiledPIDController m_turningPIDController = new ProfiledPIDController(
             kSwerve.kPModuleTurningController,
             0,
             0,
@@ -110,12 +110,12 @@ public class SwerveModule extends SubsystemBase {
         m_turnMotor.setVoltage(turnOutput);
     }
 
-    public void moveTurnMotor() {
-        m_turnMotor.setVoltage(1);
+    public void setTurnMotorSpeed(double speed) {
+        m_turnMotor.set(speed);
     }
 
-    public void moveDriveMotor() {
-        m_driveMotor.setVoltage(1);
+    public void setDriveMotorSpeed(double speed) {
+        m_driveMotor.setVoltage(speed);
     }
 
     public void goToSetPoint(double setPointRadians) {

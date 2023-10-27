@@ -100,7 +100,7 @@ public final class Constants {
       true,
       false,
       false,
-      0
+      0.1
     
       );
 
@@ -113,7 +113,7 @@ public final class Constants {
       true,
       false,
       false,
-      0
+      0.1
     );
 
     // Back Left
@@ -125,7 +125,7 @@ public final class Constants {
       true,
       false,
       false,
-      0
+      0.1
     );
 
     // Back Right
@@ -137,7 +137,7 @@ public final class Constants {
       true,
       false,
       false,
-      0
+      0.1
     );
   }
 

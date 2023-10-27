@@ -40,7 +40,7 @@ public class Drivetrain extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator;
 
   public Drivetrain(AHRS gyro) {
-    this.m_gyro = gyro;
+    // this.m_gyro = gyro;
     poseEstimator = new SwerveDrivePoseEstimator(m_kinematics, getYaw(), getModulePositions(), new Pose2d());
     try {
       /* Communicate w/navX-MXP via the MXP SPI Bus. */
@@ -105,6 +105,28 @@ public class Drivetrain extends SubsystemBase {
     }
   }
 
+  public SwerveModule[] getModules(){
+    return modules;
+  }
+
+
+
+  public void setAngleMotorSpeeds(double frontRight, double frontLeft, double backRight, double backLeft) {
+    modules[0].setTurnMotorSpeed(frontLeft);
+    modules[1].setTurnMotorSpeed(frontRight);
+    modules[2].setTurnMotorSpeed(backRight);
+    modules[3].setTurnMotorSpeed(backLeft);
+    
+
+  }
+
+  public void setDriveMotorSpeeds(double frontRight, double frontLeft, double backRight, double backLeft) {
+    modules[0].setDriveMotorSpeed(frontLeft);
+    modules[1].setDriveMotorSpeed(frontRight);
+    modules[2].setDriveMotorSpeed(backRight);
+    modules[3].setDriveMotorSpeed(backLeft);
+  }
+
   public SwerveModulePosition[] getModulePositions(){
     return new SwerveModulePosition[]{
             modules[0].getPosition(),
@@ -143,6 +165,12 @@ public class Drivetrain extends SubsystemBase {
         new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), // Back Left
         new SwerveModuleState(0, Rotation2d.fromDegrees(45)) // Back Right
     });
+  }
+
+  public void updateSmartdashboard(){
+    for (int i=0; i<3;i++){
+        modules[i].updateSmartdashboard();
+    }
   }
 
   @Override
